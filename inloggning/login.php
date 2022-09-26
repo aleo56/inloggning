@@ -9,7 +9,8 @@
 </head>
 
 <body>
-    <a href="index.html">awd</a>
+    <a href="index.html">Framsida</a>
+    <br>
     <?php
     $user = "04afpleo";
     $pass = "DanskGranola23";
