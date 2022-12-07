@@ -53,6 +53,9 @@ if ($signingIn) {
         if ($fileError === 0) {
             if ($fileSize < 100000) {
                 $fileNameNew = uniqid('', true) . "." . $fileActualExt;
+                if (!is_dir("uploads")) {
+                    mkdir("uploads");
+                }
                 $fileDestination = 'uploads/' . $fileNameNew;
                 move_uploaded_file($fileTmpName, $fileDestination);
                 // lägg till i databas
