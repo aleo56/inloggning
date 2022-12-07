@@ -12,6 +12,7 @@ if ($database->connect_error) {
 
 $signingIn = isset($_POST["sign-in"]);
 $signingUp = isset($_POST["sign-up"]);
+$uploading = isset($_POST["upload"]);
 
 if ($signingIn || $signingUp) {
     $username = $_POST["username"];
@@ -33,7 +34,49 @@ if ($signingIn) {
     } else {
         echo "invalid new username<br>";
     }
+} else if ($uploading) {
+    session_start();
+    $file = $_FILES['file'];
+
+    $fileName = $_FILES['file']['name'];
+    $fileTmpName = $_FILES['file']['tmp_name'];
+    $fileSize = $_FILES['file']['size'];
+    $fileError = $_FILES['file']['error'];
+    $fileType = $_FILES['file']['type'];
+
+    $fileExt = explode('.', $fileName);
+    $fileActualExt = strtolower(end($fileExt));
+
+    $allowed = array('jpg', 'jpeg', 'png', 'pdf');
+
+    if (in_array($fileActualExt, $allowed)) {
+        if ($fileError === 0) {
+            if ($fileSize < 100000) {
+                $fileNameNew = uniqid('', true) . "." . $fileActualExt;
+                $fileDestination = 'uploads/' . $fileNameNew;
+                move_uploaded_file($fileTmpName, $fileDestination);
+                // lägg till i databas
+                $username = $_SESSION["user"];
+                $snuskig = false;
+                if ($username == "holros") {
+                    $snuskig = true;
+                }
+                $sql = "INSERT INTO uploads (user, filepath, uploadtime, snuskig) VALUES ('$username', '$fileDestination', NOW(), '$snuskig')";
+                $result = $database->query($sql);
+
+                header("Location: index.php?uploadsuccess");
+            } else {
+                echo "För stor fil";
+            }
+        } else {
+            echo "Error";
+        }
+    } else {
+        echo "fel filtyp";
+    }
 }
+
+
 
 echo "<a href='index.php'>Go home</a>";
 
